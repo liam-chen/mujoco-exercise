@@ -1,0 +1,17 @@
+extends: default
+
+yaml-files:
+  - '*.yaml'
+  - '*.yml'
+
+ignore: |
+  *.clang-format
+
+rules:
+  document-end: disable
+  document-start: disable
+  indentation: disable
+  line-length: disable
+  new-line-at-end-of-file: enable
+  truthy:
+    check-keys: false

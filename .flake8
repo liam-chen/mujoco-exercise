@@ -1,0 +1,10 @@
+[flake8]
+mypy_config = mypy.ini
+ignore =
+    # Ignore line length limits as they are handled via black.
+    E203, E501, W503,
+exclude =
+    # exclude ".git" to avoid flake8 checking other un-current branch
+    .git
+    Bootcamp/*
+docstring-convention=numpy
