@@ -1,12 +1,15 @@
 import os
 
+import numpy as np
 from mujoco.glfw import glfw
 
 import mujoco as mj
 
-xml_path = "hello.xml"  # xml file (assumes this is in the same folder as this file)
-simend = 5  # simulation time
-print_camera_config = 0  # set to 1 to print camera config
+xml_path = (
+    "manipulator.xml"  # xml file (assumes this is in the same folder as this file)
+)
+simend = 1000  # simulation time
+print_camera_config = 1  # set to 1 to print camera config
 # this is useful for initializing view of the model)
 
 # For callback functions
@@ -126,10 +129,11 @@ glfw.set_mouse_button_callback(window, mouse_button)
 glfw.set_scroll_callback(window, scroll)
 
 # Example on how to set camera configuration
-# cam.azimuth = 90
-# cam.elevation = -45
-# cam.distance = 2
-# cam.lookat = np.array([0.0, 0.0, 0])
+# initialize the controller here. This function is called once, in the beginning
+cam.azimuth = 89.83044433593757
+cam.elevation = -89.0
+cam.distance = 5.04038754800176
+cam.lookat = np.array([0.0, 0.0, 0.0])
 
 # initialize the controller
 init_controller(model, data)
@@ -137,14 +141,39 @@ init_controller(model, data)
 # set the controller
 mj.set_mjcb_control(controller)
 
+N = 500
+q0_start = 0
+q0_end = 1.57
+q1_start = 0
+q1_end = -2 * 3.14
+q0 = np.linspace(q0_start, q0_end, N)
+q1 = np.linspace(q1_start, q1_end, N)
+
+# initialize
+data.qpos[0] = q0_start
+data.qpos[1] = q1_start
+i = 0
+time = 0
+dt = 0.001
+
 while not glfw.window_should_close(window):
-    time_prev = data.time
+    time_prev = time
 
-    while data.time - time_prev < 1.0 / 60.0:
-        mj.mj_step(model, data)
+    while time - time_prev < 1.0 / 60.0:
+        data.qpos[0] = q0[i]
+        data.qpos[1] = q1[i]
+        mj.mj_forward(model, data)
+        time += dt
+        # mj.mj_step(model, data)
 
-    if data.time >= simend:
+    i += 1
+
+    print(data.site_xpos[0])
+
+    if i >= N:
         break
+    # if (data.time>=simend):
+    #     break;
 
     # get framebuffer viewport
     viewport_width, viewport_height = glfw.get_framebuffer_size(window)
