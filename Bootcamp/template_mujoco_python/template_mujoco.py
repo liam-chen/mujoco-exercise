@@ -5,7 +5,7 @@ from mujoco.glfw import glfw
 import mujoco as mj
 
 xml_path = "hello.xml"  # xml file (assumes this is in the same folder as this file)
-simend = 5  # simulation time
+simend = 1  # simulation time
 print_camera_config = 0  # set to 1 to print camera config
 # this is useful for initializing view of the model)
 
@@ -132,16 +132,17 @@ glfw.set_scroll_callback(window, scroll)
 # cam.lookat = np.array([0.0, 0.0, 0])
 
 # initialize the controller
-init_controller(model, data)
+# init_controller(model, data)
 
-# set the controller
-mj.set_mjcb_control(controller)
+# # set the controller
+# mj.set_mjcb_control(controller)
 
 while not glfw.window_should_close(window):
     time_prev = data.time
 
-    while data.time - time_prev < 1.0 / 60.0:
+    while data.time - time_prev < 0.1:  # 1.0 / 60.0:
         mj.mj_step(model, data)
+    print(f"{data.time}: {data.geom_xpos[1][2]}")
 
     if data.time >= simend:
         break

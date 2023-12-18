@@ -1,4 +1,5 @@
 import os
+import time
 
 import numpy as np
 from mujoco.glfw import glfw
@@ -101,8 +102,7 @@ def scroll(window, xoffset, yoffset):
 
 # get the full path
 dirname = os.path.dirname(__file__)
-abspath = os.path.join(dirname + "/" + xml_path)
-xml_path = abspath
+xml_path = os.path.join(dirname + "/" + xml_path)
 
 # MuJoCo data structures
 model = mj.MjModel.from_xml_path(xml_path)  # MuJoCo model
@@ -135,11 +135,11 @@ cam.elevation = -89.0
 cam.distance = 5.04038754800176
 cam.lookat = np.array([0.0, 0.0, 0.0])
 
-# initialize the controller
-init_controller(model, data)
+# # initialize the controller
+# init_controller(model, data)
 
-# set the controller
-mj.set_mjcb_control(controller)
+# # set the controller
+# mj.set_mjcb_control(controller)
 
 N = 500
 q0_start = 0
@@ -153,18 +153,17 @@ q1 = np.linspace(q1_start, q1_end, N)
 data.qpos[0] = q0_start
 data.qpos[1] = q1_start
 i = 0
-time = 0
-dt = 0.001
+
+t1 = time.time()
 
 while not glfw.window_should_close(window):
-    time_prev = time
+    time_prev = time.time()
 
-    while time - time_prev < 1.0 / 60.0:
+    # visualize the step at the frequency of 100 Hz
+    while time.time() - time_prev < 0.01:
         data.qpos[0] = q0[i]
         data.qpos[1] = q1[i]
         mj.mj_forward(model, data)
-        time += dt
-        # mj.mj_step(model, data)
 
     i += 1
 
@@ -172,7 +171,7 @@ while not glfw.window_should_close(window):
 
     if i >= N:
         break
-    # if (data.time>=simend):
+    # if (data.time_0>=simend):
     #     break;
 
     # get framebuffer viewport
@@ -212,3 +211,6 @@ while not glfw.window_should_close(window):
     glfw.poll_events()
 
 glfw.terminate()
+
+
+print("Time taken: ", time.time() - t1)
